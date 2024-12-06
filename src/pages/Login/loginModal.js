@@ -1,23 +1,32 @@
 // src/pages/Login/LoginModal.js
 import React, { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
-
+import { useNavigate } from "react-router-dom";
 const LoginModal = ({ isOpen, onClose }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, error } = useAuth();
+  const navigate = useNavigate();
+  const { loginWithEmailPassword, login, error } = useAuth();
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    try {
-      await login(email, password);
-      onClose(); // Close modal after login
-    } catch (err) {
-      console.error("Login failed:", err.message);
+
+    if (email && password) {
+      try {
+        await loginWithEmailPassword(email, password);
+        navigate("/");
+        onClose();
+      } catch (err) {
+        console.error("Login failed:", err.message);
+      }
+    } else {
+      await login();
+
+      onClose();
     }
   };
 
-  if (!isOpen) return null; // Don't render if modal is closed
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">

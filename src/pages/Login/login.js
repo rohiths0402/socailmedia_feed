@@ -9,25 +9,25 @@ const LoginPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [setError] = useState(null); // Fixing error state
+  const [setError] = useState(null);
 
   const handleGoogleLogin = async () => {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
       console.log("Logged in user:", user);
-      navigate("/"); // Redirect to home or dashboard after successful login
+      navigate("/");
     } catch (err) {
-      setError(err.message); // Set the error message for Google login
+      setError(err.message);
       console.error("Google login error:", err.message);
     }
   };
 
   const handleLogin = async (email, password) => {
     try {
-      await login(email, password); // Perform manual login
-      setIsModalOpen(false); // Close modal after login
-      navigate("/"); // Redirect after login
+      await login(email, password);
+      setIsModalOpen(false);
+      navigate("/");
     } catch (error) {
       console.error("Login failed:", error.message);
     }
