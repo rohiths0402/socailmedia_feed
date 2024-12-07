@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useDispatch } from "react-redux"; // Import useDispatch
+import { setUser } from "../Slice/userSlice"; // Import the setUser action from your userSlice
 import {
   getAuth,
   signInWithPopup,
@@ -10,31 +12,60 @@ import {
   linkWithCredential,
   EmailAuthProvider,
 } from "firebase/auth";
-import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore"; // Import Firestore
+import { getFirestore, doc, setDoc, getDoc } from "firebase/firestore";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [error, setError] = useState(null);
+  const dispatch = useDispatch(); // Initialize dispatch
 
   const auth = getAuth();
-  const db = getFirestore(); // Initialize Firestore
+  const db = getFirestore();
 
-  // Listen to auth state changes and update currentUser accordingly
   useEffect(() => {
-    const unsubscribe = auth.onAuthStateChanged(setCurrentUser);
-    return unsubscribe; // Cleanup on component unmount
-  }, [auth]);
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        const displayName = user.displayName || user.email; // Fallback to email if displayName is null
 
-  // Google Login Function
+        // Update Redux store with the user info using userSlice
+        dispatch(
+          setUser({
+            uid: user.uid,
+            email: user.email,
+            displayName, // Use the fallback displayName
+            photoURL: user.photoURL,
+            providerId: user.providerId,
+          }),
+        );
+
+        setCurrentUser({
+          uid: user.uid,
+          email: user.email,
+          displayName, // Use fallback displayName
+          photoURL: user.photoURL,
+          providerId: user.providerId,
+        });
+      } else {
+        // Clear the user from both state and Redux if logged out
+        dispatch(setUser(null));
+        setCurrentUser(null);
+      }
+    });
+
+    return unsubscribe;
+  }, [auth, dispatch]); // Make sure dispatch is in the dependency array
+
   const login = async () => {
     const provider = new GoogleAuthProvider();
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Check if user already exists in Firestore
+      // Check if user has a displayName
+      const displayName = user.displayName || user.email; // Fallback to email if displayName is null
+
       const userRef = doc(db, "users", user.uid);
       const userDoc = await getDoc(userRef);
 
@@ -44,7 +75,7 @@ export const AuthProvider = ({ children }) => {
         // Save user details to Firestore if not already saved
         await setDoc(userRef, {
           email: user.email,
-          displayName: user.displayName,
+          displayName, // Use displayName from Google or fallback to email
           photoURL: user.photoURL,
           providerId: user.providerId,
           createdAt: new Date(),
@@ -59,10 +90,22 @@ export const AuthProvider = ({ children }) => {
       setCurrentUser({
         uid: user.uid,
         email: user.email,
-        displayName: user.displayName,
+        displayName, // Use the fallback displayName
         photoURL: user.photoURL,
         providerId: user.providerId,
       });
+
+      // Dispatch user to Redux using userSlice
+      dispatch(
+        setUser({
+          uid: user.uid,
+          email: user.email,
+          displayName,
+          photoURL: user.photoURL,
+          providerId: user.providerId,
+        }),
+      );
+
       setError(null);
     } catch (err) {
       setError(err.message);
@@ -92,6 +135,18 @@ export const AuthProvider = ({ children }) => {
         photoURL: user.photoURL,
         providerId: user.providerId,
       });
+
+      // Dispatch user to Redux using userSlice
+      dispatch(
+        setUser({
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+          providerId: user.providerId,
+        }),
+      );
+
       setError(null);
     } catch (err) {
       setError(err.message);
@@ -116,6 +171,18 @@ export const AuthProvider = ({ children }) => {
         photoURL: user.photoURL,
         providerId: user.providerId,
       });
+
+      // Dispatch user to Redux using userSlice
+      dispatch(
+        setUser({
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+          photoURL: user.photoURL,
+          providerId: user.providerId,
+        }),
+      );
+
       setError(null);
     } catch (err) {
       setError(err.message);
@@ -128,6 +195,7 @@ export const AuthProvider = ({ children }) => {
     try {
       await signOut(auth);
       setCurrentUser(null);
+      dispatch(setUser(null)); // Clear user from Redux when logged out
     } catch (err) {
       console.error("Logout failed:", err.message);
     }

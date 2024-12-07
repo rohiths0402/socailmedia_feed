@@ -1,9 +1,21 @@
-// src/slices/postsSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  posts: [],
-  loading: false, // Add loading state here
+  posts: [
+    {
+      id: 13,
+      name: "Daniel Harris",
+      timestamp: "2024-12-06T21:00:00Z",
+      text: "Just got a new!",
+      hashtags: '["#puppy", "#cute"]',
+      images: "",
+      likes: 90,
+      video:
+        "https://v1.pinimg.com/videos/mc/720p/c0/1d/12/c01d124f8c97b75a78fb20800e0f8cf8.mp4",
+    },
+  ], // Initialize as an empty array
+  loading: false,
+  lastVisible: null,
 };
 
 const postsSlice = createSlice({
@@ -11,18 +23,14 @@ const postsSlice = createSlice({
   initialState,
   reducers: {
     setPosts: (state, action) => {
-      state.posts = action.payload;
-      state.loading = false; // Set loading to false when posts are set
+      state.posts = [...state.posts, ...action.payload.posts];
+      state.lastVisible = action.payload.lastVisible;
     },
-    addPost: (state, action) => {
-      state.posts.unshift(action.payload);
-    },
-    setLoading: (state) => {
-      state.loading = true; // Set loading to true when fetching starts
+    setLoading: (state, action) => {
+      state.loading = action.payload;
     },
   },
 });
 
-export const { setPosts, addPost, setLoading } = postsSlice.actions;
-
+export const { setPosts, setLoading } = postsSlice.actions;
 export default postsSlice.reducer;

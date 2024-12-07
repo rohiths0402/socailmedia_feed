@@ -17,7 +17,6 @@ const Feed = () => {
   const { posts, loading, lastVisible } = useSelector((state) => state.posts);
   const dispatch = useDispatch();
 
-  // Load posts from Firestore
   const loadPosts = async () => {
     const db = getFirestore();
     let postsQuery = query(
@@ -35,11 +34,14 @@ const Feed = () => {
     try {
       const querySnapshot = await getDocs(postsQuery);
       const newPosts = querySnapshot.docs.map((doc) => ({
-        ...doc.data(),
         id: doc.id,
+        ...doc.data(),
       }));
+
       const lastVisiblePost = querySnapshot.docs[querySnapshot.docs.length - 1];
-      dispatch(setPosts({ posts: newPosts, lastVisible: lastVisiblePost }));
+      const lastVisibleId = lastVisiblePost ? lastVisiblePost.id : null;
+
+      dispatch(setPosts({ posts: newPosts, lastVisible: lastVisibleId }));
     } catch (error) {
       console.error("Error loading posts: ", error);
     } finally {
@@ -47,25 +49,29 @@ const Feed = () => {
     }
   };
 
-  // Infinite scroll handler
-  const handleScroll = (e) => {
-    const bottom =
-      e.target.scrollHeight === e.target.scrollTop + e.target.clientHeight;
-    if (bottom && !loading) {
-      loadPosts();
-    }
-  };
-
   useEffect(() => {
     loadPosts();
   }, []);
+  useEffect(() => {
+    const postIds = posts.map((post) => post.id);
+    const uniqueIds = new Set(postIds);
+
+    if (uniqueIds.size !== postIds.length) {
+      console.warn("Duplicate keys found in posts:", postIds);
+    }
+  }, [posts]);
 
   return (
-    <div onScroll={handleScroll} className="feed-container overflow-auto">
-      {posts.map((post) => (
-        <Post key={post.id} post={post} />
-      ))}
-      {loading && <p>Loading posts...</p>}
+    <div className="feed-container bg-white-200 overflow-auto mt-20">
+      {Array.isArray(posts) && posts.length > 0 ? (
+        posts.map((post, index) => {
+          const key = post.id ? post.id : `fallback-key-${index}`;
+
+          return <Post key={key} post={post} />;
+        })
+      ) : (
+        <p>{loading ? "Loading posts..." : "No posts available."}</p>
+      )}
     </div>
   );
 };

@@ -96,7 +96,7 @@ const LoginPage = () => {
             y={549}
             width={125}
             height={207}
-            fill="url(#pattern7_54621_65)"
+            fill="  "
           />
           <rect
             x={134}
