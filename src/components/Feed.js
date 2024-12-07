@@ -1,5 +1,4 @@
-// src/components/Feed.js
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setPosts, setLoading } from "../Slice/postsSlice";
 import Post from "./Post";
@@ -7,15 +6,19 @@ import {
   getFirestore,
   collection,
   getDocs,
+  addDoc,
   query,
   orderBy,
   limit,
   startAfter,
+  serverTimestamp,
 } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 const Feed = () => {
   const { posts, loading, lastVisible } = useSelector((state) => state.posts);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const loadPosts = async () => {
     const db = getFirestore();
@@ -52,21 +55,17 @@ const Feed = () => {
   useEffect(() => {
     loadPosts();
   }, []);
-  useEffect(() => {
-    const postIds = posts.map((post) => post.id);
-    const uniqueIds = new Set(postIds);
 
-    if (uniqueIds.size !== postIds.length) {
-      console.warn("Duplicate keys found in posts:", postIds);
-    }
-  }, [posts]);
+  const handleLabelClick = () => {
+    navigate("/preview"); // Navigate to the preview page
+  };
 
   return (
     <div className="feed-container bg-white-200 overflow-auto mt-20">
+      {/* Posts Feed */}
       {Array.isArray(posts) && posts.length > 0 ? (
         posts.map((post, index) => {
           const key = post.id ? post.id : `fallback-key-${index}`;
-
           return <Post key={key} post={post} />;
         })
       ) : (

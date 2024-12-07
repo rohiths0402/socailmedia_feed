@@ -1,15 +1,12 @@
-// src/components/UserProfile.js
 import React from "react";
-import { useSelector } from "react-redux";
 
-const UserProfile = () => {
-  const { user } = useSelector((state) => state.user);
-
+function EditProfile() {
   return (
     <div className="bg-white shadow-md rounded-lg p-4">
       <button className="absolute top-5 left-3  flex items-center text-white font-bold py-2 px-4 rounded-3xl -mb-10 z-10">
         <a href="/">
-          <i className="fas fa-arrow-left mr-2"></i>
+          <i className="fas fa-arrow-left mr-2"> </i>
+          Edit Profile
         </a>
       </button>
       <svg
@@ -82,42 +79,46 @@ const UserProfile = () => {
           </defs>
         </svg>
 
-        <button className="bg-white text-black font-bold  px-4  outline outline-gray-200 rounded-3xl w-64 mt-14 ml-3">
-          <a href="/edit">Edit Profile</a>
+        <button className="bg-white text-gary font-bold w-8 h-8  rounded-full   -mt-14 mr-4">
+          <i className="fas fa-pen mr-2 ml-2"></i>
         </button>
       </div>
 
       <div className="mt-4">
-        <h2 className="text-xl font-bold">Sakshi Agarwal</h2>
-        <p className="text-gray-500">
-          Just someone who loves designing, sketching, and finding beauty in the
-          little things
-        </p>
+        <label
+          htmlFor="name"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Name
+        </label>
+        <input
+          type="text"
+          id="name"
+          className="mt-1 block w-full border-b border-gray-300 focus:outline-none focus:ring-0 focus:border-indigo-500 sm:text-sm"
+        />
       </div>
 
       <div className="mt-4">
-        <h3 className="text-lg font-bold">My Posts</h3>
-        <div className="grid grid-cols-2 gap-4 mt-2">
-          <div className="bg-gray-100 p-4 rounded-lg">
-            <img
-              src="https://via.placeholder.com/200"
-              alt="Post 1"
-              className="w-full rounded-lg"
-            />
-            <p className="text-gray-600 mt-2">Design Meet</p>
-          </div>
-          <div className="bg-gray-100 p-4 rounded-lg">
-            <img
-              src="https://via.placeholder.com/200"
-              alt="Post 2"
-              className="w-full rounded-lg"
-            />
-            <p className="text-gray-600 mt-2">Working on a B2B Project</p>
-          </div>
-        </div>
+        <label
+          htmlFor="bio"
+          className="block text-sm font-medium text-gray-700"
+        >
+          Bio
+        </label>
+        <textarea
+          id="bio"
+          rows="4"
+          className="mt-1 block w-full border-b border-gray-300 focus:outline-none focus:ring-0 focus:border-indigo-500 sm:text-sm"
+        ></textarea>
+      </div>
+
+      <div className="absolute bottom-10 w-80 ml-5">
+        <button className="bg-black hover:bg-gray-700 text-white font-bold py-2 px-4 rounded-full w-full">
+          Save
+        </button>
       </div>
     </div>
   );
-};
+}
 
-export default UserProfile;
+export default EditProfile;

@@ -91,13 +91,7 @@ const LoginPage = () => {
             height={207}
             fill="url(#pattern6_54621_65)"
           />
-          <rect
-            x={267}
-            y={549}
-            width={125}
-            height={207}
-            fill="  "
-          />
+          <rect x={267} y={549} width={125} height={207} fill="  " />
           <rect
             x={134}
             width={125}
@@ -339,17 +333,16 @@ const LoginPage = () => {
           <p className="text-gray-600 mb-4 mt-3">Or</p>
 
           <button
-            onClick={() => setIsModalOpen(true)} // Open the modal when clicked
+            onClick={() => setIsModalOpen(true)}
             className="w-20 max-w-xs p-3 -mt-10 bg-white-500 text-blue rounded-md hover:bg-white-400 transition duration-300"
           >
             Login
           </button>
 
-          {/* Render the LoginModal when isModalOpen is true */}
           <LoginModal
             isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)} // Close the modal
-            onLogin={handleLogin} // Pass the login function to modal
+            onClose={() => setIsModalOpen(false)}
+            onLogin={handleLogin}
           />
         </div>
       </div>
